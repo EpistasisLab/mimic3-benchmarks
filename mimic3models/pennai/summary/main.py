@@ -126,7 +126,9 @@ def main():
     val_summary=pd.DataFrame(data=val,columns=summary_header)
     val_summary.to_pickle(args.output_dir + "./val_summary.pkl")
 
+    bal = ''
     if(args.balanced):
+        bal='_bal'
         #create balanced training dataset
         class_count=min(train_summary.groupby('class').size())
         train_summary=train_summary.assign(class_count=0)
@@ -141,6 +143,33 @@ def main():
                 count_false+=1
         train_summary = train_summary[train_summary.class_count < class_count]
         train_summary = train_summary.drop(columns=['class_count'])
+        #create balanced testing dataset
+        class_count=min(train_summary.groupby('class').size())
+        test_summary=test_summary.assign(class_count=0)
+        count_true = 0
+        count_false = 0
+        for i, row in test_summary.iterrows():
+            if (row['class'] == 1):
+                test_summary.set_value(i,'class_count',count_true)
+                count_true+=1
+            if (row['class'] == 0):
+                test_summary.set_value(i,'class_count',count_false)
+                count_false+=1
+        test_summary = test_summary[test_summary.class_count < class_count]
+        test_summary = test_summary.drop(columns=['class_count'])
+        #create balanced testing dataset
+        class_count=min(val_summary.groupby('class').size())
+        val_summary=val_summary.assign(class_count=0)
+        count_true = 0
+        count_false = 0
+        for i, row in val_summary.iterrows():
+            if (row['class'] == 1):
+                val_summary.set_value(i,'class_count',count_true)
+                count_true+=1
+            if (row['class'] == 0):
+                val_summary.set_value(i,'class_count',count_false)
+                count_false+=1
+        val_summary = test_summary[test_summary.class_count < class_count]
 
 
 
@@ -153,9 +182,9 @@ def main():
     train_summary = train_summary.round(decimals=3)
     val_summary = val_summary.round(decimals=3)
     #save to csv
-    train_summary.to_csv(args.output_dir + './train_summary.csv',index=False)
-    test_summary.to_csv(args.output_dir + './test_summary.csv',index=False)
-    val_summary.to_csv(args.output_dir + './val_summary.csv',index=False)
+    train_summary.to_csv(args.output_dir + './train'+bal+'_summary.csv',index=False)
+    test_summary.to_csv(args.output_dir + './test'+bal+'_summary.csv',index=False)
+    val_summary.to_csv(args.output_dir + './val'+bal+'_summary.csv',index=False)
     print('done')
 
 if __name__ == '__main__':
