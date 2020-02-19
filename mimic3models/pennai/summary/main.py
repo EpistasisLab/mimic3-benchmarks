@@ -82,13 +82,14 @@ def main():
     if(train_header != test_header or train_header != val_header):
         print("something went wrong.  training and test headers do not match")
         exit()
-    for i in train_header: 
-        if(i != 'Hours'):
-            for stat in stats:
-                if(stat == 'mean' and i not in mean_only_columns or i in calc_stat_columns):
-                    summary_header.append(i + '_' + stat) 
-                else:
-                    summary_header.append('deleteme_' + i + '_' + stat) 
+    for j in ['1','2','3','4','5','6','7']: 
+        for i in train_header: 
+            if(i != 'Hours'):
+                for stat in stats:
+                    if(stat == 'mean' and i not in mean_only_columns or i in calc_stat_columns):
+                        summary_header.append(j + '_' + i + '_' + stat) 
+                    else:
+                        summary_header.append('deleteme_' + j + '_' + i + '_' + stat) 
     class_column = phenotype_header.index(args.phenotype)
     summary_header.append('class') 
 
@@ -117,7 +118,9 @@ def main():
     test=np.append(test_X,test_y[:,class_column][:, None],axis=1)
     val=np.append(val_X,val_y[:,class_column][:, None],axis=1)
     #
+#    print(summary_header)
     train_summary=pd.DataFrame(data=train,columns=summary_header)
+#    train_summary=pd.DataFrame(data=train)
     train_summary.to_pickle(args.output_dir + "./train_summary.pkl")
     #
     test_summary=pd.DataFrame(data=test,columns=summary_header)
@@ -169,7 +172,8 @@ def main():
             if (row['class'] == 0):
                 val_summary.set_value(i,'class_count',count_false)
                 count_false+=1
-        val_summary = test_summary[test_summary.class_count < class_count]
+        val_summary = val_summary[val_summary.class_count < class_count]
+        val_summary = val_summary.drop(columns=['class_count'])
 
 
 

@@ -43,8 +43,9 @@ periods_map = {
     "first50percent": (2, 50)
 }
 
-sub_periods = [(2, 100)]
-
+#sub_periods = [(2, 100)]
+sub_periods = [(2, 100), (2, 10), (2, 25), (2, 50),
+               (3, 10), (3, 25), (3, 50)]
 
 
 def get_range(begin, end, period):
